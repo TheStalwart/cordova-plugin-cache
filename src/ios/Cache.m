@@ -20,6 +20,7 @@
 
 
 #import "Cache.h"
+#import <WebKit/WKWebsiteDataStore.h>
 
 @implementation Cache
 
@@ -38,8 +39,21 @@
 
         // clear cache
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
-        [self success];
 
+        // clear WKWebView data
+        if (NSClassFromString(@"WKWebsiteDataStore")) {
+            [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:[WKWebsiteDataStore allWebsiteDataTypes]
+                                                       modifiedSince:[NSDate distantPast] 
+                                                   completionHandler:^{ [self success]; }];
+        } else {
+            /* 
+             * No fallback implementation for iOS 8
+             * because we don't use it for development
+             * and don't need it for production
+             */
+
+            [self success];
+        }
     }];
 }
 
